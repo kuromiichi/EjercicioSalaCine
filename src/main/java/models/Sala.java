@@ -1,45 +1,41 @@
 package models;
 
-import enums.Estados;
+import enums.Estado;
 
 public class Sala {
-    private String nombreSala;
-    private String nombrePelicula;
+    private final String nombreSala;
+    private Pelicula pelicula;
     private final int numFilas;
     private final int numColumnas;
-    private Estados[][] estadoSala;
+    private Estado[][] estadoSala;
 
-    public Sala(String nombreSala, String nombrePelicula, int numFilas, int numColumnas) {
+    public Sala(String nombreSala, Pelicula pelicula, int numFilas, int numColumnas) {
         this.nombreSala = nombreSala;
-        this.nombrePelicula = nombrePelicula;
+        this.pelicula = pelicula;
         this.numFilas = numFilas;
         this.numColumnas = numColumnas;
         this.estadoSala = inicializarSala(numFilas, numColumnas);
     }
 
     public String getNombreSala() {
-        return nombreSala;
+        return this.nombreSala;
     }
 
     public String getNombrePelicula() {
-        return nombrePelicula;
+        return this.pelicula.getNombre();
     }
 
-    public void setNombrePelicula(String nombrePelicula) {
-        this.nombrePelicula = nombrePelicula;
-    }
-
-    private Estados[][] inicializarSala(int numFilas, int numColumnas) {
-        Estados[][] sala = new Estados[numFilas][numColumnas];
+    private Estado[][] inicializarSala(int numFilas, int numColumnas) {
+        Estado[][] sala = new Estado[numFilas][numColumnas];
         for (int i = 0; i < numFilas; i++) {
             for (int j = 0; j < numColumnas; j++) {
-                sala[i][j] = Estados.LIBRE;
+                sala[i][j] = Estado.LIBRE;
             }
         }
         return sala;
     }
 
-    public void cambiarEstadoButaca(String butaca, Estados estado) {}
+    public void cambiarEstadoButaca(String butaca, Estado estado) {}
 
     private int[] obtenerButaca(String codigoButaca) {
         return new int[0];

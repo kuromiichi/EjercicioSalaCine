@@ -1,5 +1,5 @@
 package enums;
 
-public enum Estados {
+public enum Estado {
     LIBRE, RESERVADA, OCUPADA
 }
