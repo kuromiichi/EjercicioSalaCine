@@ -3,20 +3,20 @@ package models;
 import enums.Genero;
 
 public class Pelicula {
-    private final String nombre;
+    private final String titulo;
     private int fecha;
     private final String director;
     private Genero genero;
 
-    public Pelicula(String nombre, String fecha, String director, String genero) {
-        this.nombre = nombre;
+    public Pelicula(String titulo, String fecha, String director, String genero) {
+        this.titulo = titulo;
         setFecha(fecha);
         this.director = director;
         setGenero(genero);
     }
 
-    public String getNombre() {
-        return this.nombre;
+    public String getTitulo() {
+        return this.titulo;
     }
 
     public int getFecha() {
