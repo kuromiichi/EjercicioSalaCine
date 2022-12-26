@@ -27,6 +27,10 @@ public class Sala {
         return this.pelicula.getTitulo();
     }
 
+    public Estado[][] getEstadoSala() {
+        return this.estadoSala;
+    }
+
     private Estado[][] inicializarSala(int numFilas, int numColumnas) {
         // Las filas están limitadas a 26 por el número de letras que se pueden asignar
         if (numFilas > 26) throw new IllegalArgumentException("Se ha superado el número máximo de filas (26)");
@@ -41,12 +45,15 @@ public class Sala {
 
     public void cambiarEstadoButaca(String butaca, Estado estado) {
         int[] codigoButaca = procesarCodigoButaca(butaca);
+        Estado estadoAnterior = estadoSala[codigoButaca[0]][codigoButaca[1]];
         estadoSala[codigoButaca[0]][codigoButaca[1]] = estado;
-        if (estado == Estado.OCUPADA) {
-            recaudacion += PRECIO_BUTACA;
-        } else if (estado == Estado.LIBRE) {
-            recaudacion -= PRECIO_BUTACA;
-        }
+        cambiarRecaudacion(estado, estadoAnterior);
+    }
+
+    private void cambiarRecaudacion(Estado estado, Estado estadoAnterior) {
+        if (estadoAnterior == Estado.LIBRE || estadoAnterior == Estado.RESERVADA) {
+            if (estado == Estado.OCUPADA) recaudacion += PRECIO_BUTACA;
+        } else recaudacion -= PRECIO_BUTACA;
     }
 
     private int[] procesarCodigoButaca(String butaca) {
