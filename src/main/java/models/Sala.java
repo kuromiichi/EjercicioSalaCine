@@ -9,7 +9,6 @@ public class Sala {
     private final int numFilas;
     private final int numColumnas;
     private double recaudacion = 0.0;
-    private final double PRECIO_BUTACA = 5.25;
 
     public Sala(String nombreSala, Pelicula pelicula, int numFilas, int numColumnas) {
         this.nombreSala = nombreSala;
@@ -31,7 +30,11 @@ public class Sala {
         return this.estadoSala;
     }
 
-    private Estado[][] inicializarSala(int numFilas, int numColumnas) {
+    public double getRecaudacion() {
+        return this.recaudacion;
+    }
+
+    public Estado[][] inicializarSala(int numFilas, int numColumnas) {
         // Las filas están limitadas a 26 por el número de letras que se pueden asignar
         if (numFilas > 26) throw new IllegalArgumentException("Se ha superado el número máximo de filas (26)");
         Estado[][] sala = new Estado[numFilas][numColumnas];
@@ -51,12 +54,18 @@ public class Sala {
     }
 
     private void cambiarRecaudacion(Estado estado, Estado estadoAnterior) {
-        if (estadoAnterior == Estado.LIBRE || estadoAnterior == Estado.RESERVADA) {
+        if (estado == estadoAnterior) {
+            throw new IllegalArgumentException("No se ha actualizado el estado: ya era " + estado.name());
+        }
+        double PRECIO_BUTACA = 5.25;
+        if (estadoAnterior == Estado.OCUPADA) {
+            recaudacion -= PRECIO_BUTACA;
+        } else {
             if (estado == Estado.OCUPADA) recaudacion += PRECIO_BUTACA;
-        } else recaudacion -= PRECIO_BUTACA;
+        }
     }
 
-    private int[] procesarCodigoButaca(String butaca) {
+    private int[] procesarCodigoButaca(String butaca) throws IllegalArgumentException {
         String codigoRegex = "[A-Z]\\d{1,2}";
         if (!butaca.matches(codigoRegex))
             throw new IllegalArgumentException("El código de butaca no es válido: formato incorrecto");
@@ -70,73 +79,78 @@ public class Sala {
         return new int[]{fila, columna};
     }
 
-    public void imprimirEstadoSala() {
+    public String getPlanoSala() {
         String letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder plano = new StringBuilder();
         // Primeras filas (números)
-        System.out.print("   0");
+        plano.append("   0");
         for (int i = 2; i <= numColumnas; i++) {
             if (i % 10 == 0) {
-                System.out.print(" " + i / 10);
+                plano.append(" ").append(i / 10);
             } else {
-                System.out.print("  ");
+                plano.append("  ");
             }
         }
-        System.out.println();
-        System.out.print("  ");
+        plano.append("\n");
+        plano.append("  ");
         for (int i = 1; i <= numColumnas; i++) {
-            System.out.print(" " + i % 10);
+            plano.append(" ").append(i % 10);
         }
-        System.out.println();
+        plano.append("\n");
         // Resto de filas (letra + butacas)
         for (int i = 0; i < numFilas; i++) {
             // Marco de la tabla
-            System.out.print("  ");
+            plano.append("  ");
             for (int j = 0; j < numColumnas; j++) {
-                System.out.print("|-");
+                plano.append("|-");
             }
-            System.out.println("|");
+            plano.append("|\n");
             // Fila de butacas
-            System.out.print(letras.charAt(i) + " ");
+            plano.append(letras.charAt(i)).append(" ");
             for (int j = 0; j < numColumnas; j++) {
-                System.out.print("|" + caracterEstado(estadoSala[i][j]));
+                plano.append("|").append(caracterEstado(estadoSala[i][j]));
             }
-            System.out.println("|");
+            plano.append("|\n");
         }
         // Última fila (cerrar la tabla)
-        System.out.print("  ");
+        plano.append("  ");
         for (int j = 0; j < numColumnas; j++) {
-            System.out.print("|-");
+            plano.append("|-");
         }
-        System.out.println("|");
+        plano.append("|");
+
+        return plano.toString();
     }
 
     private char caracterEstado(Estado estado) {
         switch (estado) {
-            case LIBRE -> {
-                return ' ';
-            }
             case RESERVADA -> {
                 return 'R';
             }
             case OCUPADA -> {
                 return 'O';
             }
+            default -> {
+                return ' ';
+            }
         }
-        return ' ';
     }
 
-    public void imprimirInformeSala() {
-        System.out.println("Sala \"" + this.nombreSala + "\"");
-        System.out.println("Película: \"" + this.getTituloPelicula() + "\"");
+    public String getInformeSala() {
+        StringBuilder informe = new StringBuilder();
+        informe.append("Sala \"").append(this.getNombreSala()).append("\"\n");
+        informe.append("Película: \"").append(this.getTituloPelicula()).append("\"\n");
         int[] estadoButacas = getButacas();
-        System.out.println("Número de butacas ocupadas: " + estadoButacas[1]);
-        System.out.println("Número de butacas reservadas: " + estadoButacas[2]);
+        informe.append("Número de butacas ocupadas: ").append(estadoButacas[1]).append("\n");
+        informe.append("Número de butacas reservadas: ").append(estadoButacas[2]).append("\n");
         switch (estadoButacas[0]) {
-            case 1 -> System.out.println("Queda una butaca libre");
-            case 0 -> System.out.println("No quedan butacas libres");
-            default -> System.out.println("Quedan " + estadoButacas[0] + " butacas libres");
+            case 1 -> informe.append("Queda una butaca libre");
+            case 0 -> informe.append("No quedan butacas libres");
+            default -> informe.append("Quedan ").append(estadoButacas[0]).append(" butacas libres");
         }
-        System.out.printf("Recaudación total de la sala: %.2f%n", this.recaudacion);
+        informe.append(String.format("\nRecaudación total de la sala: %.2f", this.recaudacion));
+
+        return informe.toString();
     }
 
     private int[] getButacas() {
